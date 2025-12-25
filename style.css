@@ -1,0 +1,83 @@
+/* --- General Body Styling --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+    color: #fff;
+    margin: 0;
+    padding: 40px;
+    text-align: center;
+}
+
+/* --- Header --- */
+h2 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* --- Input Field --- */
+input#driver_id {
+    padding: 12px 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    width: 250px;
+    outline: none;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+}
+
+/* --- Buttons --- */
+button {
+    padding: 12px 20px;
+    margin: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+}
+
+/* --- Start Button Styling --- */
+#start_btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+#start_btn:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+/* --- Stop Button Styling --- */
+#stop_btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+#stop_btn:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
+
+/* --- GPS Display --- */
+.gps-display {
+    margin-top: 25px;
+    font-size: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    display: inline-block;
+}
+
+/* --- Status Message --- */
+#status_id {
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
+    display: inline-block;
+}
