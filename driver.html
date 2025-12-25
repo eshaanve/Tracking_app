@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver GPS Tracker</title>
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="driver.css">
+</head>
+<body>
+
+    <h2>Driver Panel</h2>
+
+    <!-- Login Input -->
+    <label for="driver_id">Driver ID:</label>
+    <input type="text" id="driver_id" placeholder="Enter your Driver ID" />
+
+    <br>
+
+    <!-- Buttons -->
+    <button id="start_btn">Start Trip</button>
+    <button id="stop_btn">Stop Trip</button>
+
+    <!-- GPS Display -->
+    <div class="gps-display">
+        <p>Latitude: <span id="lat_id">--</span></p>
+        <p>Longitude: <span id="lng_id">--</span></p>
+    </div>
+
+    <!-- Status Messages -->
+    <p id="status_id">Status: Idle</p>
+
+    <!-- Link to external JS -->
+    <script src="driver.js"></script>
+
+</body>
+</html>
