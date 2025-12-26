@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Portal - Live Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+
+        <div id="dest-section" class="hidden">
+            <h2>Welcome, <span id="user-display"></span></h2>
+            <p>Select your destination to calculate fare:</p>
+            <select id="destination">
+                <option value="Station A" data-fare="20">Station A (Rs. 20)</option>
+                <option value="Station B" data-fare="35">Station B (Rs. 35)</option>
+                <option value="City Center" data-fare="50">City Center (Rs. 50)</option>
+            </select>
+            <button onclick="startTracking()">Find Nearest Bus</button>
+            <button onclick="logout()" style="background:#e74c3c; margin-top:5px;">Logout</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="passenger.js"></script>
+    
+</body>
+</html>
