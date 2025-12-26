@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test GPS Sender</title>
+</head>
+<body>
+
+<h2>Send GPS Update</h2>
+
+<button type="button" onclick="sendGPS(27.7172, 85.3240)">Location 1</button>
+<button type="button" onclick="sendGPS(27.7190, 85.3270)">Location 2</button>
+<button type="button" onclick="sendGPS(27.7215, 85.3310)">Location 3</button>
+
+<script>
+function sendGPS(lat, lng) {
+  fetch("gps_update.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      bus_id: 1,
+      route_id: 1,
+      latitude: lat,
+      longitude: lng,
+      speed: 25
+    }).toString()
+  })
+  .then(res => res.json())
+  .then(data => console.log("GPS Update:", data))
+  .catch(err => console.error(err));
+}
+</script>
+
+</body>
+</html>

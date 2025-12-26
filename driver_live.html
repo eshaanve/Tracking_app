@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Driver Live GPS</title>
+</head>
+<body>
+
+<h2>Driver GPS Sender</h2>
+<button type="button" onclick="startTracking()">Start Live GPS</button>
+
+<script>
+let watchId = null;
+
+function startTracking() {
+  if (!navigator.geolocation) {
+    alert("Geolocation not supported");
+    return;
+  }
+
+  watchId = navigator.geolocation.watchPosition(
+    position => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      const speed = position.coords.speed || 0;
+
+      fetch("gps_update.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          bus_id: 1,
+          route_id: 1,
+          latitude: lat,
+          longitude: lng,
+          speed: speed
+        }).toString()
+      })
+      .then(res => res.json())
+      .then(data => console.log("Sent:", data))
+      .catch(err => console.error(err));
+    },
+    error => {
+  alert(
+    "GPS error:\n" +
+    "Code: " + error.code + "\n" +
+    "Message: " + error.message
+  );
+  console.error(error);
+}
+,
+    {
+  enableHighAccuracy: false,
+  maximumAge: 30000,   // allow cached location (30 sec)
+  timeout: 20000       // wait longer for GPS fix
+}
+
+  );
+
+  alert("Live tracking started");
+}
+</script>
+
+</body>
+</html>
