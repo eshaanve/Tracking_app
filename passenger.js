@@ -6,6 +6,7 @@ window.onload = () => {
 };
 
 function loginUser() {
+<<<<<<< HEAD
     const name = document.getElementById('name').value.trim();
     const contact = document.getElementById('contact').value.trim();
     const ageVal = document.getElementById('age').value; // Get raw string first
@@ -24,6 +25,17 @@ function loginUser() {
         localStorage.setItem('passengerData', JSON.stringify({ name, contact, age, condition }));
         window.location.href = "Pdestination.html";
     }
+=======
+    const user = { 
+        name: document.getElementById('name').value, 
+        contact: document.getElementById('contact').value,
+        age: document.getElementById('age').value,
+        condition: document.getElementById('condition').value
+    };
+    if (!user.name || !user.contact) return alert("Fill all fields");
+    localStorage.setItem('passengerData', JSON.stringify(user));
+    showDestSection(user.name);
+>>>>>>> 02837de0d5aefd1e83b91c1aa22e634fcddfe39c
 }
 
 function showDestSection(name) {

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bus Tracker Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<<script>
+  // Initialize map
+  const map = L.map('map').setView([27.7172, 85.3240], 14);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  //bus icon
+  const busIcon = L.icon({
+    iconUrl: 'assets/bus.png',
+    iconSize: [40, 40],      // size of the icon
+    iconAnchor: [20, 20],    // point of the icon which corresponds to marker's location
+    popupAnchor: [0, -20]    // popup position
+  });
+
+  // Initial marker (placeholder)
+  const busMarker = L.marker([27.7172, 85.3240], {
+    icon: busIcon
+  }).addTo(map);
+
+  function updateBusLocation() {
+    fetch("get_bus.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "route_id=1"
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        busMarker.setPopupContent("Bus not available");
+        return;
+      }
+
+      const lat = parseFloat(data.latitude);
+      const lng = parseFloat(data.longitude);
+
+      busMarker.setLatLng([lat, lng]);
+
+      const status = data.offline ? "Offline" : "Online";
+      busMarker.setPopupContent(
+        `Bus Status: ${status}<br>Speed: ${data.speed} km/h`
+      );
+    })
+    .catch(err => console.error(err));
+  }
+
+  // Fetch every 5 seconds
+  updateBusLocation();
+  setInterval(updateBusLocation, 5000);
+</script>
+
+
+</body>
+</html>
