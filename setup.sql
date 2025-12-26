@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS bus_tracker;
+USE bus_tracker;
+
+CREATE TABLE IF NOT EXISTS drivers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    phone VARCHAR(20) NOT NULL,
+    driver_name VARCHAR(100)
+
+);
+
+CREATE TABLE IF NOT EXISTS routes (
+    id INT PRIMARY KEY ,
+    route_name VARCHAR(100) NOT NULL,
+    stop_lat DOUBLE NOT NULL,
+    stop_lng DOUBLE NOT NULL
+
+);
+
+CREATE TABLE IF NOT EXISTS bus_location (
+    bus_id INT PRIMARY KEY,
+    route_id INT NOT NULL,
+    latitude DOUBLE NOT NULL,
+    longitude DOUBLE NOT NULL,
+    speed DOUBLE NOT NULL,
+    last_updated DATETIME NOT NULL
+);
