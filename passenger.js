@@ -6,15 +6,33 @@ window.onload = () => {
 };
 
 function loginUser() {
-    const user = { 
-        name: document.getElementById('name').value, 
-        contact: document.getElementById('contact').value,
-        age: document.getElementById('age').value,
-        condition: document.getElementById('condition').value
-    };
-    if (!user.name || !user.contact) return alert("Fill all fields");
+    const name = document.getElementById('name').value;
+    const contact = document.getElementById('contact').value;
+    const age = parseInt(document.getElementById('age').value);
+    const condition = document.getElementById('condition').value;
+
+    // 1. Check if required fields are empty
+    if (!name || !contact) {
+        return alert("Please fill in Name and Contact Number.");
+    }
+
+    // 2. Validate Age (Should not be negative)
+    if (age < 0) {
+        return alert("Age cannot be a negative number.");
+    }
+
+    // 3. Validate Contact (Must be exactly 10 digits)
+    const phonePattern = /^[0-9]{10}$/;
+    if (!phonePattern.test(contact)) {
+        return alert("Contact number must be exactly 10 digits.");
+    }
+
+    // 4. Success: Save and Redirect
+    const user = { name, contact, age, condition };
     localStorage.setItem('passengerData', JSON.stringify(user));
-    showDestSection(user.name);
+    
+    // Redirecting to the separate destination page as requested
+    window.location.href = "Pdestination.html";
 }
 
 function showDestSection(name) {
