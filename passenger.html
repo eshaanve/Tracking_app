@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -30,13 +30,15 @@
             text-align: center;
         }
 
-        h2 {
-            font-size: 26px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 30px;
-            font-weight: 800;
+       h2 {
+        font-size: 26px;
+        background: linear-gradient(to right, #ffffff, #94a3b8);
+        -webkit-background-clip: text; /* Clips the background to the text shape */
+        background-clip: text;         /* Standard version for compatibility */
+        -webkit-text-fill-color: transparent; /* Makes text transparent so gradient shows */
+        color: transparent;            /* Fallback */
+        margin-bottom: 30px;
+        font-weight: 800;
         }
 
         input, select {

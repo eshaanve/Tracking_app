@@ -1,121 +1,85 @@
-/* --- General Body Styling --- */
+/* --- Global Resets --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
                 #0b0f1a;
     color: #f1f5f9;
-    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    overflow-x: hidden;
+    padding: 20px;
 }
 
-/* --- Glassmorphism Panel --- */
-.panel {
-    width: 440px;
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 40px;
+/* --- Premium Glassmorphism Card --- */
+.container {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 45px 35px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
 
-/* --- Typography --- */
 h2 {
-    font-size: 24px;
-    background: linear-gradient(to right, #fff, #94a3b8);
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
-    margin-bottom: 24px;
-    font-weight: 800;
 }
 
-/* --- Premium Input Styling --- */
-input#driver_id {
+/* --- Refined Inputs & Select --- */
+input, select {
     width: 100%;
-    padding: 14px 16px;
-    background: rgba(15, 23, 42, 0.6);
+    padding: 15px 18px;
+    margin-bottom: 18px;
+    background: rgba(15, 23, 42, 0.5);
     border: 1.5px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 16px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-input#driver_id:focus {
-    border-color: #3b82f6;
-    background: rgba(15, 23, 42, 0.9);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+input:focus, select:focus {
     outline: none;
+    border-color: #3b82f6;
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
-/* --- Button Mechanics --- */
+/* --- High-Performance Button --- */
 button {
-    flex: 1;
-    padding: 14px 24px;
-    border-radius: 12px;
+    width: 100%;
+    padding: 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 14px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.5);
 }
 
-#start_btn {
-    background: #10b981;
-    color: #064e3b;
-    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
-}
-
-#start_btn:hover {
-    background: #34d399;
+button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.4);
+    background: #2563eb;
+    box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.6);
 }
 
-#stop_btn {
-    background: #ef4444;
-    color: #450a0a;
-    box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.3);
-}
+button:active { transform: translateY(0); }
 
-#stop_btn:hover {
-    background: #f87171;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(239, 68, 68, 0.4);
-}
-
-/* --- GPS & Status Display --- */
-.gps-display {
-    margin-top: 24px;
-    background: rgba(15, 23, 42, 0.4);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 16px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    color: #94a3b8;
-}
-
-#status_id {
-    margin-top: 15px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    text-transform: uppercase;
-    background: rgba(59, 130, 246, 0.1);
-    color: #60a5fa;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
+::placeholder { color: rgba(148, 163, 184, 0.7); }

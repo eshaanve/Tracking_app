@@ -6,33 +6,24 @@ window.onload = () => {
 };
 
 function loginUser() {
-    const name = document.getElementById('name').value;
-    const contact = document.getElementById('contact').value;
-    const age = parseInt(document.getElementById('age').value);
+    const name = document.getElementById('name').value.trim();
+    const contact = document.getElementById('contact').value.trim();
+    const ageVal = document.getElementById('age').value; // Get raw string first
+    const age = parseInt(ageVal);
     const condition = document.getElementById('condition').value;
 
-    // 1. Check if required fields are empty
-    if (!name || !contact) {
-        return alert("Please fill in Name and Contact Number.");
+    // Validation checks
+    if (!name || !contact || !ageVal) {
+        alert("Please fill in all fields.");
+    } else if (age < 0 || age > 150) {
+        alert("Age must be between 0 and 150.");
+    } else if (!/^[0-9]{10}$/.test(contact)) {
+        alert("Contact must be exactly 10 digits.");
+    } else {
+        // Success: Store and Redirect
+        localStorage.setItem('passengerData', JSON.stringify({ name, contact, age, condition }));
+        window.location.href = "Pdestination.html";
     }
-
-    // 2. Validate Age (Should not be negative)
-    if (age < 0) {
-        return alert("Age cannot be a negative number.");
-    }
-
-    // 3. Validate Contact (Must be exactly 10 digits)
-    const phonePattern = /^[0-9]{10}$/;
-    if (!phonePattern.test(contact)) {
-        return alert("Contact number must be exactly 10 digits.");
-    }
-
-    // 4. Success: Save and Redirect
-    const user = { name, contact, age, condition };
-    localStorage.setItem('passengerData', JSON.stringify(user));
-    
-    // Redirecting to the separate destination page as requested
-    window.location.href = "Pdestination.html";
 }
 
 function showDestSection(name) {
