@@ -6,7 +6,6 @@ window.onload = () => {
 };
 
 function loginUser() {
-<<<<<<< HEAD
     const name = document.getElementById('name').value.trim();
     const contact = document.getElementById('contact').value.trim();
     const ageVal = document.getElementById('age').value; // Get raw string first
@@ -25,33 +24,43 @@ function loginUser() {
         localStorage.setItem('passengerData', JSON.stringify({ name, contact, age, condition }));
         window.location.href = "Pdestination.html";
     }
-=======
-    const user = { 
-        name: document.getElementById('name').value, 
-        contact: document.getElementById('contact').value,
-        age: document.getElementById('age').value,
-        condition: document.getElementById('condition').value
-    };
-    if (!user.name || !user.contact) return alert("Fill all fields");
-    localStorage.setItem('passengerData', JSON.stringify(user));
-    showDestSection(user.name);
->>>>>>> 02837de0d5aefd1e83b91c1aa22e634fcddfe39c
-}
-
-function showDestSection(name) {
-    document.getElementById('user-display').innerText = name;
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('dest-section').classList.remove('hidden');
 }
 
 function startTracking() {
     const sel = document.getElementById('destination');
-    document.getElementById('fare-amt').innerText = sel.options[sel.selectedIndex].dataset.fare;
-    document.getElementById('dest-section').classList.add('hidden');
-    document.getElementById('tracking-section').classList.remove('hidden');
-    initMap();
+    const fare = sel.options[sel.selectedIndex].dataset.fare;
+    const dest = sel.value;
+    // Redirect to your second page with data in the URL
+    window.location.href = `Ptracking.html?fare=${fare}&dest=${encodeURIComponent(dest)}`;
+}
+// Run check on page load
+window.onload = function() {
+    const savedUser = localStorage.getItem('passengerData');
+    if (savedUser) {
+        showDestination(); // Skip login if data exists
+    }
+};
+
+function loginUser() {
+    const data = {
+        name: document.getElementById('name').value,
+        contact: document.getElementById('contact').value,
+        age: document.getElementById('age').value,
+        condition: document.getElementById('condition').value
+    };
+
+    if (data.name && data.contact) {
+        localStorage.setItem('passengerData', JSON.stringify(data)); // Save to browser
+        showDestination();
+    } else {
+        alert("Please fill in required fields");
+    }
 }
 
+function logout() {
+    localStorage.removeItem('passengerData');
+    location.reload();
+}
 function initMap() {
     map = L.map('map').setView([0, 0], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
