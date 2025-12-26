@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Portal - Live Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        
+        <div id="tracking-section" class="hidden">
+            <div id="map"></div>
+            
+            <div id="bus-info" class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong>Bus: <span id="bus-num">--</span></strong>
+                    <span id="status" class="badge">Checking...</span>
+                </div>
+                <hr>
+                <p><strong>Driver:</strong> <span id="driver-info">--</span></p>
+                <p><strong>Capacity:</strong> <span id="seats" style="color:blue; font-weight:bold;">--</span></p>
+                <p><strong>Your Fare:</strong> Rs. <span id="fare-amt">0</span></p>
+                <p><strong>Estimated Arrival:</strong> <span id="eta" style="font-size:1.2em; color:#27ae60; font-weight:bold;">--</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="passenger.js"></script>
+</body>
+</html>
