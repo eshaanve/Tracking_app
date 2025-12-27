@@ -2,29 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passenger Portal - Live Tracker</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Live Tracking</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        .overlay { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(15, 23, 42, 0.9); padding: 20px; border-radius: 20px; width: 350px; border: 1px solid rgba(255,255,255,0.1); color: white; text-align: center; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        
-        <div id="tracking-section" class="hidden">
-            <div id="map"></div>
-            
-            <div id="bus-info" class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong>Bus: <span id="bus-num">--</span></strong>
-                    <span id="status" class="badge">Checking...</span>
-                </div>
-                <hr>
-                <p><strong>Driver:</strong> <span id="driver-info">--</span></p>
-                <p><strong>Capacity:</strong> <span id="seats" style="color:blue; font-weight:bold;">--</span></p>
-                <p><strong>Your Fare:</strong> Rs. <span id="fare-amt">0</span></p>
-                <p><strong>Estimated Arrival:</strong> <span id="eta" style="font-size:1.2em; color:#27ae60; font-weight:bold;">--</span></p>
-            </div>
-        </div>
+    <div id="map"></div>
+    <div class="overlay">
+        <h3 id="target-dest-display">To: --</h3>
+        <p>Fare: <span id="live-fare" style="color: #3b82f6; font-weight: bold;">0</span></p>
+        <p>Bus Speed: <span id="live-speed">0</span> km/h</p>
+        <div id="status-badge" style="margin-top: 10px; display: inline-block; padding: 5px 15px; border-radius: 15px;">LIVE</div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
