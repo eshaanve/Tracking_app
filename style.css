@@ -1,124 +1,85 @@
-/* --- General Body Styling --- */
+/* --- Global Resets --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: radial-gradient(1200px 600px at 10% 10%, rgba(37,117,252,0.12), transparent),
-                linear-gradient(135deg, #0f172a 0%, #0b1f3a 60%);
-    color: #e6eef8;
-    margin: 0;
-    padding: 48px 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
+                #0b0f1a;
+    color: #f1f5f9;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    padding: 20px;
 }
 
-/* --- Header --- */
+/* --- Premium Glassmorphism Card --- */
+.container {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 45px 35px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
 h2 {
     font-size: 28px;
-    margin: 0 0 12px 0;
-    letter-spacing: 0.6px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+/* --- Refined Inputs & Select --- */
+input, select {
+    width: 100%;
+    padding: 15px 18px;
+    margin-bottom: 18px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-/* --- Input Field --- */
-input#driver_id {
-    padding: 12px 14px;
-    font-size: 16px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.03);
-    color: #e6eef8;
-    border-radius: 8px;
-    margin: 8px 0 16px 0;
-    width: 260px;
-    outline: none;
-    transition: box-shadow .18s ease, transform .12s ease;
-    box-shadow: 0 4px 18px rgba(6,10,28,0.6);
-}
-
-/* --- Buttons --- */
-button {
-    padding: 10px 18px;
-    margin: 8px;
-    font-size: 15px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
-    color: #fff;
-    min-width: 120px;
-    font-weight: 600;
-}
-
-/* --- Start Button Styling --- */
-#start_btn {
-    background: linear-gradient(180deg, #28a745, #1e7b3a);
-}
-
-#start_btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(40,167,69,0.18);
-}
-
-/* --- Stop Button Styling --- */
-#stop_btn {
-    background: linear-gradient(180deg, #ef4444, #c92a2a);
-}
-
-#stop_btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(220,53,69,0.18);
-}
-
-/* --- GPS Display --- */
-.gps-display {
-    margin-top: 18px;
-    font-size: 16px;
-    padding: 14px 18px;
-    border-radius: 12px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-    display: inline-block;
-    color: #cfe8ff;
-    min-width: 280px;
-    text-align: left;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 8px 30px rgba(2,6,23,0.6);
-}
-
-/* --- Status Message --- */
-#status_id {
-    margin-top: 18px;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.03);
-    display: inline-block;
-    color: #dff6ff;
-}
-
-/* --- Container for centered card --- */
-.panel {
-    width: 420px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     border-radius: 14px;
-    padding: 26px 26px 28px 26px;
-    box-shadow: 0 10px 30px rgba(2,6,23,0.65);
-    backdrop-filter: blur(6px);
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --- Form row styling --- */
-.row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-
-label[for="driver_id"] { display: none; }
-
-/* --- Small helpers --- */
-.muted { color: rgba(222,235,255,0.6); font-size: 13px; }
-
-/* --- Responsive --- */
-@media (max-width: 480px) {
-    .panel { width: 92%; padding: 18px; }
-    input#driver_id { width: 100%; }
-    .gps-display { min-width: 100%; }
+input:focus, select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
+
+/* --- High-Performance Button --- */
+button {
+    width: 100%;
+    padding: 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.5);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    background: #2563eb;
+    box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.6);
+}
+
+button:active { transform: translateY(0); }
+
+::placeholder { color: rgba(148, 163, 184, 0.7); }
