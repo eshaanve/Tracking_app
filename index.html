@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracker Prototype| Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Animated Gradient Background */
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 450px;
+        }
+
+        h1 { color: white; font-size: 2.5rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -1px; }
+        p { color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 1rem; }
+
+        .btn-container { display: flex; flex-direction: column; gap: 20px; }
+
+        .role-btn {
+            position: relative;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* Specific styles for Driver vs Passenger */
+        .driver-btn:hover { background: #3498db; color: white; transform: scale(1.05); }
+        .passenger-btn:hover { background: #2ecc71; color: white; transform: scale(1.05); }
+
+        .role-btn i { font-size: 1.4rem; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <h1> Tracker Prototype </h1>
+        <p>Real-time Transit Intelligence</p>
+        
+        <div class="btn-container">
+            <button class="role-btn driver-btn" onclick="redirectTo('driver.html')">
+                <i class="fas fa-bus"></i> Driver Portal
+            </button>
+            <button class="role-btn passenger-btn" onclick="redirectTo('passenger.html')">
+                <i class="fas fa-user-friends"></i> Passenger Portal
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function redirectTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>

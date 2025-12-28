@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Tracking</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        .overlay { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(15, 23, 42, 0.9); padding: 20px; border-radius: 20px; width: 350px; border: 1px solid rgba(255,255,255,0.1); color: white; text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="overlay">
+        <h3 id="target-dest-display">To: --</h3>
+        <p>Fare: <span id="live-fare" style="color: #3b82f6; font-weight: bold;">0</span></p>
+        <p>Bus Speed: <span id="live-speed">0</span> km/h</p>
+        <p>Estimated Arrival: <span id="eta-display" style="color: #10b981; font-weight: bold;">Calculating...</span></p>
+        <div id="status-badge" style="margin-top: 10px; display: inline-block; padding: 5px 15px; border-radius: 15px;">LIVE</div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="passenger.js"></script>
+</body>
+</html>

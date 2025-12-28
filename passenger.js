@@ -1,72 +1,84 @@
+/* --- passenger.js: Final Version with Dual Tracking & Boarding Sync --- */
 let map, busMarker, userMarker;
 
 window.onload = () => {
+    const isMapPage = document.getElementById('map');
+    const isDestPage = document.getElementById('dest-section');
+    const isLoginPage = document.getElementById('login-section');
     const user = JSON.parse(localStorage.getItem('passengerData'));
-    if (user) showDestSection(user.name);
+
+    if (isLoginPage && user) window.location.href = "Pdestination.html";
+
+    if (isMapPage) {
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('live-fare').innerText = "Rs. " + (params.get('fare') || "0");
+        document.getElementById('target-dest-display').innerText = "To: " + (params.get('dest') || "Unknown");
+        initMap();
+    } else if (isDestPage) {
+        if (!user) window.location.href = "index.html";
+        document.getElementById('user-display').innerText = user.name;
+    }
 };
 
 function loginUser() {
-    const user = { 
-        name: document.getElementById('name').value, 
-        contact: document.getElementById('contact').value,
-        age: document.getElementById('age').value,
-        condition: document.getElementById('condition').value
-    };
-    if (!user.name || !user.contact) return alert("Fill all fields");
-    localStorage.setItem('passengerData', JSON.stringify(user));
-    showDestSection(user.name);
-}
+    const name = document.getElementById('name').value.trim();
+    const contact = document.getElementById('contact').value.trim();
+    const age = document.getElementById('age').value;
+   if (!name || name.length < 3) return alert("Please enter a valid full name.");
+    if (!/^[0-9]{10}$/.test(contact)) return alert("Contact must be exactly 10 digits.");
+    if (isNaN(age) || age < 5 || age > 120) return alert("Please enter a realistic age (5-120).");
+    localStorage.setItem('passengerData', JSON.stringify({ name, contact, age }));
 
-function showDestSection(name) {
-    document.getElementById('user-display').innerText = name;
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('dest-section').classList.remove('hidden');
+    document.getElementById('login-section').innerHTML = `
+        <h2 style="color: #10b981;">Thank You for Visiting!</h2>
+        <p>Details saved successfully.</p>
+        <button onclick="window.location.href='Pdestination.html'">Welcome to Portal</button>`;
 }
 
 function startTracking() {
     const sel = document.getElementById('destination');
-    document.getElementById('fare-amt').innerText = sel.options[sel.selectedIndex].dataset.fare;
-    document.getElementById('dest-section').classList.add('hidden');
-    document.getElementById('tracking-section').classList.remove('hidden');
-    initMap();
+    window.location.href = `Ptracking.html?fare=${sel.options[sel.selectedIndex].dataset.fare}&dest=${encodeURIComponent(sel.value)}`;
 }
 
 function initMap() {
-    map = L.map('map').setView([0, 0], 13);
+    map = L.map('map').setView([27.7172, 85.3240], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    
-    // Static marker initialized at 0,0; updated by fetchBusData
-    busMarker = L.marker([0, 0]).addTo(map).bindPopup("Bus Location");
+    busMarker = L.marker([0, 0], {icon: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448339.png', iconSize: [40, 40]})}).addTo(map).bindPopup("Bus Location");
 
+    // Live Passenger Location (Moves as you walk/ride)
     navigator.geolocation.watchPosition(pos => {
         const loc = [pos.coords.latitude, pos.coords.longitude];
-        if (!userMarker) {
-            userMarker = L.marker(loc).addTo(map).bindPopup("You");
-            map.setView(loc);
+        if (!userMarker) { 
+            userMarker = L.marker(loc).addTo(map).bindPopup("You are here").openPopup(); 
+            map.setView(loc); 
+        } else {
+            userMarker.setLatLng(loc);
         }
-        userMarker.setLatLng(loc);
-    });
+    }, err => console.error(err), { enableHighAccuracy: true });
 
     setInterval(fetchBusData, 5000);
-    fetchBusData();
 }
 
 async function fetchBusData() {
     try {
-        const res = await fetch('get_bus.php');
+        const res = await fetch("get_bus.php", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "route_id=1" });
         const d = await res.json();
-        
-        console.log("Real DB Update:", d); // Log live data to console
-        
-        if (d.latitude) {
-            const pos = [parseFloat(d.latitude), parseFloat(d.longitude)];
-            busMarker.setLatLng(pos);
-            document.getElementById('bus-num').innerText = d.bus_no;
-            document.getElementById('driver-info').innerText = d.driver;
-            document.getElementById('seats').innerText = d.seats + " Seats Left";
-            document.getElementById('eta').innerText = d.eta + " mins";
-            document.getElementById('status').innerText = d.is_offline ? "OFFLINE" : "LIVE";
-            document.getElementById('status').style.color = d.is_offline ? "red" : "green";
+        if (d.success) {
+            const busPos = L.latLng(parseFloat(d.latitude), parseFloat(d.longitude));
+            busMarker.setLatLng(busPos);
+            document.getElementById('live-speed').innerText = d.speed || 0;
+
+            if (userMarker) {
+                const dist = userMarker.getLatLng().distanceTo(busPos);
+                // When distance < 20m, markers will overlap perfectly
+              document.getElementById('eta-display').innerText =
+  dist < 30
+    ? "On Board"
+    : (d.speed > 0
+        ? Math.round((dist / ((d.speed ?? 0) * (5/18))) / 60) + " mins"
+        : "Stopped");
+
+            }
         }
-    } catch (e) { console.error("API Error:", e); }
+    } catch (e) { console.log("Sync Error"); }
 }

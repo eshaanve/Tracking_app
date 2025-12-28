@@ -3,9 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passenger Portal - Live Tracker</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Passenger Portal - Login</title>
+    <style>
+        /* --- Premium Improvised CSS --- */
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+                        #0b0f1a;
+            color: #f1f5f9;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 400px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+       h2 {
+        font-size: 26px;
+        background: linear-gradient(to right, #ffffff, #94a3b8);
+        -webkit-background-clip: text; /* Clips the background to the text shape */
+        background-clip: text;         /* Standard version for compatibility */
+        -webkit-text-fill-color: transparent; /* Makes text transparent so gradient shows */
+        color: transparent;            /* Fallback */
+        margin-bottom: 30px;
+        font-weight: 800;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+            outline: none;
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background: #2563eb;
+            box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,40 +87,12 @@
             <h2>Passenger Login</h2>
             <input type="text" id="name" placeholder="Full Name" required>
             <input type="text" id="contact" placeholder="Contact Number" required>
-            <input type="number" id="age" placeholder="Age">
+            <input type="number" id="age" placeholder="Age" min="5" max="150" required>
             <select id="condition">
                 <option value="Normal">Condition: Normal</option>
                 <option value="Physical Disability">Condition: Physical Disability</option>
             </select>
             <button onclick="loginUser()">Login & Save Details</button>
-        </div>
-
-        <div id="dest-section" class="hidden">
-            <h2>Welcome, <span id="user-display"></span></h2>
-            <p>Select your destination to calculate fare:</p>
-            <select id="destination">
-                <option value="Station A" data-fare="20">Station A (Rs. 20)</option>
-                <option value="Station B" data-fare="35">Station B (Rs. 35)</option>
-                <option value="City Center" data-fare="50">City Center (Rs. 50)</option>
-            </select>
-            <button onclick="startTracking()">Find Nearest Bus</button>
-            <button onclick="logout()" style="background:#e74c3c; margin-top:5px;">Logout</button>
-        </div>
-
-        <div id="tracking-section" class="hidden">
-            <div id="map"></div>
-            
-            <div id="bus-info" class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong>Bus: <span id="bus-num">--</span></strong>
-                    <span id="status" class="badge">Checking...</span>
-                </div>
-                <hr>
-                <p><strong>Driver:</strong> <span id="driver-info">--</span></p>
-                <p><strong>Capacity:</strong> <span id="seats" style="color:blue; font-weight:bold;">--</span></p>
-                <p><strong>Your Fare:</strong> Rs. <span id="fare-amt">0</span></p>
-                <p><strong>Estimated Arrival:</strong> <span id="eta" style="font-size:1.2em; color:#27ae60; font-weight:bold;">--</span></p>
-            </div>
         </div>
     </div>
 
