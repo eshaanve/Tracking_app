@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver GPS Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Driver GPS Tracker</h2>
+        <p>Welcome, <span id="driver-name"></span> | Route: <span id="route-name"></span> | Vehicle: <span id="vehicle-number"></span></p>
+
+        <div class="row buttons">
+            <button id="start_btn">Start Trip</button><br><br>
+            <button id="stop_btn">Stop Trip</button>
+        </div>
+
+        <br>
+
+        <div class="gps-display">
+            <p>Latitude: <span id="lat_id">--</span></p>
+            <p>Longitude: <span id="lng_id">--</span></p>
+        </div>
+
+        <p id="status_id" class="status">Status: Idle</p>
+
+        <button onclick="logout()" style="margin-top: 20px; background: #dc2626; color: white; border: none; padding: 10px; border-radius: 5px;">Logout</button>
+    </div>
+
+    <script src="driver.js"></script>
+</body>
+</html>

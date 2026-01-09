@@ -4,10 +4,19 @@ let map, busMarker, userMarker;
 window.onload = () => {
     const isMapPage = document.getElementById('map');
     const isDestPage = document.getElementById('dest-section');
-    const isLoginPage = document.getElementById('login-section');
-    const user = JSON.parse(localStorage.getItem('passengerData'));
+    const isChoicePage = document.getElementById('choice-section');
+    const userData = localStorage.getItem('passengerData');
+    let user = null;
+    if (userData) {
+        try {
+            user = JSON.parse(userData);
+        } catch (e) {
+            console.error('Error parsing passengerData:', e);
+            localStorage.removeItem('passengerData'); // Clear corrupted data
+        }
+    }
 
-    if (isLoginPage && user) window.location.href = "Pdestination.html";
+    if (isChoicePage && user) window.location.href = "Pdestination.html";
 
     if (isMapPage) {
         const params = new URLSearchParams(window.location.search);
@@ -15,30 +24,93 @@ window.onload = () => {
         document.getElementById('target-dest-display').innerText = "To: " + (params.get('dest') || "Unknown");
         initMap();
     } else if (isDestPage) {
-        if (!user) window.location.href = "index.html";
+        if (!user) window.location.href = "passenger.html";
         document.getElementById('user-display').innerText = user.name;
+        document.getElementById('dest-section').classList.remove('hidden');
     }
 };
 
-function loginUser() {
-    const name = document.getElementById('name').value.trim();
-    const contact = document.getElementById('contact').value.trim();
-    const age = document.getElementById('age').value;
-   if (!name || name.length < 3) return alert("Please enter a valid full name.");
-    if (!/^[0-9]{10}$/.test(contact)) return alert("Contact must be exactly 10 digits.");
-    if (isNaN(age) || age < 5 || age > 120) return alert("Please enter a realistic age (5-120).");
-    localStorage.setItem('passengerData', JSON.stringify({ name, contact, age }));
+window.showLogin = function() {
+    console.log('showLogin called');
+    document.getElementById('choice-section').classList.add('hidden');
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('signup-section').classList.add('hidden');
+};
 
-    document.getElementById('login-section').innerHTML = `
-        <h2 style="color: #10b981;">Thank You for Visiting!</h2>
-        <p>Details saved successfully.</p>
-        <button onclick="window.location.href='Pdestination.html'">Welcome to Portal</button>`;
-}
+window.showSignUp = function() {
+    console.log('showSignUp called');
+    document.getElementById('choice-section').classList.add('hidden');
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('signup-section').classList.remove('hidden');
+};
 
-function startTracking() {
+window.backToChoice = function() {
+    console.log('backToChoice called');
+    document.getElementById('choice-section').classList.remove('hidden');
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('signup-section').classList.add('hidden');
+};
+
+window.loginUser = function(mode) {
+    console.log('loginUser called with mode:', mode);
+    if (mode === 'login') {
+        const name = document.getElementById('login-name').value.trim();
+        const contact = document.getElementById('login-contact').value.trim();
+        if (!name || name.length < 3) return alert("Please enter a valid full name.");
+        if (!/^[0-9]{10}$/.test(contact)) return alert("Contact must be exactly 10 digits.");
+
+        fetch('login_passenger.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(name)}&contact=${encodeURIComponent(contact)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('passengerData', JSON.stringify(data.passenger));
+                window.location.href = 'Pdestination.html';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error logging in. Please try again.');
+        });
+    } else if (mode === 'signup') {
+        const name = document.getElementById('name').value.trim();
+        const contact = document.getElementById('contact').value.trim();
+        const age = document.getElementById('age').value;
+        const condition = document.getElementById('condition').value;
+       if (!name || name.length < 3) return alert("Please enter a valid full name.");
+        if (!/^[0-9]{10}$/.test(contact)) return alert("Contact must be exactly 10 digits.");
+        if (isNaN(age) || age < 5 || age > 120) return alert("Please enter a realistic age (5-120).");
+
+        fetch('save_passenger.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(name)}&contact=${encodeURIComponent(contact)}&age=${age}&condition=${encodeURIComponent(condition)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('passengerData', JSON.stringify({ name, contact, age, condition, id: data.passenger_id }));
+                window.location.href = 'Pdestination.html';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error signing up. Please try again.');
+        });
+    }
+};
+
+window.startTracking = function() {
     const sel = document.getElementById('destination');
     window.location.href = `Ptracking.html?fare=${sel.options[sel.selectedIndex].dataset.fare}&dest=${encodeURIComponent(sel.value)}`;
-}
+};
 
 function initMap() {
     map = L.map('map').setView([27.7172, 85.3240], 15);
@@ -58,6 +130,11 @@ function initMap() {
 
     setInterval(fetchBusData, 5000);
 }
+
+window.logout = function() {
+    localStorage.removeItem('passengerData');
+    window.location.href = 'passenger.html';
+};
 
 async function fetchBusData() {
     try {

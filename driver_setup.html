@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passenger Portal - Login</title>
+    <title>Driver Setup</title>
     <style>
-        /* --- Premium Improvised CSS --- */
+        /* Similar styles */
         body {
             font-family: 'Inter', 'Segoe UI', sans-serif;
             background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
@@ -30,15 +30,15 @@
             text-align: center;
         }
 
-       h2 {
-        font-size: 26px;
-        background: linear-gradient(to right, #ffffff, #94a3b8);
-        -webkit-background-clip: text; /* Clips the background to the text shape */
-        background-clip: text;         /* Standard version for compatibility */
-        -webkit-text-fill-color: transparent; /* Makes text transparent so gradient shows */
-        color: transparent;            /* Fallback */
-        margin-bottom: 30px;
-        font-weight: 800;
+        h2 {
+            font-size: 26px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            margin-bottom: 30px;
+            font-weight: 800;
         }
 
         input, select {
@@ -54,7 +54,7 @@
             box-sizing: border-box;
         }
 
-        input:focus {
+        input:focus, select:focus {
             border-color: #3b82f6;
             outline: none;
             background: rgba(15, 23, 42, 0.9);
@@ -87,35 +87,18 @@
 </head>
 <body>
     <div class="container">
-        <div id="choice-section">
-            <h2>Passenger Portal</h2>
-            <button onclick="showLogin()">Login</button>
-            <button onclick="showSignUp()">Sign Up</button>
-        </div>
-
-        <div id="login-section" class="hidden">
-            <h2>Passenger Login</h2>
-            <input type="text" id="login-name" placeholder="Full Name" required>
-            <input type="text" id="login-contact" placeholder="Contact Number" required>
-            <button onclick="loginUser('login')">Login</button>
-            <button onclick="backToChoice()">Back</button>
-        </div>
-
-        <div id="signup-section" class="hidden">
-            <h2>Passenger Sign Up</h2>
-            <input type="text" id="name" placeholder="Full Name" required>
-            <input type="text" id="contact" placeholder="Contact Number" required>
-            <input type="number" id="age" placeholder="Age" min="5" max="150" required>
-            <select id="condition">
-                <option value="Normal">Condition: Normal</option>
-                <option value="Physical Disability">Condition: Physical Disability</option>
+        <div id="setup-section">
+            <h2>Welcome, <span id="driver-name"></span></h2>
+            <p>Set up your ride:</p>
+            <select id="route">
+                <!-- Routes loaded dynamically -->
             </select>
-            <button onclick="loginUser('signup')">Sign Up</button>
-            <button onclick="backToChoice()">Back</button>
+            <input type="text" id="vehicle" placeholder="Vehicle Number" required>
+            <button onclick="saveSetup()">Save & Start</button>
+            <button onclick="logout()" style="margin-top: 10px; background: #dc2626;">Logout</button>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="passenger.js"></script>
+    <script src="driver.js"></script>
 </body>
 </html>
