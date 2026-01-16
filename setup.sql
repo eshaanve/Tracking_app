@@ -24,3 +24,11 @@ CREATE TABLE IF NOT EXISTS bus_location (
     speed DOUBLE NOT NULL,
     last_updated DATETIME NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS passengers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    contact VARCHAR(20) NOT NULL,
+    age INT NOT NULL,
+    `condition` VARCHAR(50) DEFAULT 'Normal'
+);

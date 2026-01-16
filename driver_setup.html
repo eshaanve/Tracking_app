@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Portal - Login</title>
+    <title>Driver Setup</title>
     <style>
-        /* Similar to passenger.html styles */
+        /* Similar styles */
         body {
             font-family: 'Inter', 'Segoe UI', sans-serif;
             background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
@@ -41,7 +41,7 @@
             font-weight: 800;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 14px;
             margin-bottom: 15px;
@@ -54,7 +54,7 @@
             box-sizing: border-box;
         }
 
-        input:focus {
+        input:focus, select:focus {
             border-color: #3b82f6;
             outline: none;
             background: rgba(15, 23, 42, 0.9);
@@ -87,10 +87,15 @@
 </head>
 <body>
     <div class="container">
-        <div id="login-section">
-            <h2>Driver Login</h2>
-            <input type="text" id="phone" placeholder="Phone Number" required>
-            <button onclick="loginDriver()">Login</button>
+        <div id="setup-section">
+            <h2>Welcome, <span id="driver-name"></span></h2>
+            <p>Set up your ride:</p>
+            <select id="route">
+                <!-- Routes loaded dynamically -->
+            </select>
+            <input type="text" id="vehicle" placeholder="Vehicle Number" required>
+            <button onclick="saveSetup()">Save & Start</button>
+            <button onclick="logout()" style="margin-top: 10px; background: #dc2626;">Logout</button>
         </div>
     </div>
 
