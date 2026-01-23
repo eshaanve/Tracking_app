@@ -5,16 +5,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 
   <style>
-    #map {
-      height: 100vh;
-      width: 100%;
+    body { margin: 0; padding: 0; }
+    #map { height: 100vh; width: 100%; }
+    
+    /* Hide the routing instructions panel */
+    .leaflet-routing-container { display: none; }
+
+    /* Style for the stop name labels */
+    .stop-label-style {
+        background: white;
+        border: 1px solid #3498db;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-weight: bold;
+        color: #2c3e50;
     }
   </style>
 </head>
@@ -22,63 +30,91 @@
 
 <div id="map"></div>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<script src="route_data.js"></script>
 
-<<script>
+<script>
   // Initialize map
-  const map = L.map('map').setView([27.7172, 85.3240], 14);
+  const map = L.map('map').setView([27.7172, 85.3240], 13);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© CARTO'
   }).addTo(map);
 
-  //bus icon
-  const busIcon = L.icon({
-    iconUrl: 'assets/bus.png',
-    iconSize: [40, 40],      // size of the icon
-    iconAnchor: [20, 20],    // point of the icon which corresponds to marker's location
-    popupAnchor: [0, -20]    // popup position
+  // Define Custom Icons
+  const stopIcon = L.icon({
+    iconUrl: 'assets/stop-icon.png', 
+    iconSize: [32, 32],
+    iconAnchor: [16, 32]
   });
 
-  // Initial marker (placeholder)
-  const busMarker = L.marker([27.7172, 85.3240], {
-    icon: busIcon
-  }).addTo(map);
+  const busIcon = L.icon({
+    iconUrl: 'assets/bus.png',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20]
+  });
+
+  // 4. ADDED: Interactive Routing and Stops
+  if (typeof routeStops !== 'undefined') {
+    const waypoints = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
+
+    L.Routing.control({
+      waypoints: waypoints,
+      addWaypoints: false,
+      draggableWaypoints: false,
+      show: false,
+      lineOptions: {
+        styles: [{ color: '#3498db', opacity: 0.6, weight: 6 }]
+      },
+      createMarker: function(i, wp) {
+        const marker = L.marker(wp.latLng, {
+          icon: stopIcon,
+          interactive: true
+        });
+
+        // This makes the name appear only when you click or hover
+        marker.bindTooltip(routeStops[i].name || "Stop " + (i + 1), {
+          permanent: false, 
+          sticky: true,
+          direction: 'top',
+          className: 'stop-label-style'
+        });
+
+        // Zoom in when a stop is clicked
+        marker.on('click', function(e) {
+          map.setView(e.target.getLatLng(), 16);
+        });
+
+        return marker;
+      }
+    }).addTo(map);
+  }
+
+  // Live Bus Marker
+  const busMarker = L.marker([27.7172, 85.3240], { icon: busIcon }).addTo(map);
 
   function updateBusLocation() {
     fetch("get_bus.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: "route_id=1"
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "route_id=3" 
     })
     .then(res => res.json())
     .then(data => {
-      if (!data.success) {
-        busMarker.setPopupContent("Bus not available");
-        return;
+      if (data.success) {
+        busMarker.setLatLng([parseFloat(data.latitude), parseFloat(data.longitude)]);
+        const status = data.offline ? "Offline" : "Online";
+        busMarker.setPopupContent(`Bus Status: ${status}<br>Speed: ${data.speed} km/h`);
       }
-
-      const lat = parseFloat(data.latitude);
-      const lng = parseFloat(data.longitude);
-
-      busMarker.setLatLng([lat, lng]);
-
-      const status = data.offline ? "Offline" : "Online";
-      busMarker.setPopupContent(
-        `Bus Status: ${status}<br>Speed: ${data.speed} km/h`
-      );
     })
     .catch(err => console.error(err));
   }
 
-  // Fetch every 5 seconds
   updateBusLocation();
   setInterval(updateBusLocation, 5000);
 </script>
-
 
 </body>
 </html>
