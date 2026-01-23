@@ -4,16 +4,43 @@ USE bus_tracker;
 CREATE TABLE IF NOT EXISTS drivers (
     id INT PRIMARY KEY AUTO_INCREMENT,
     phone VARCHAR(20) NOT NULL,
-    driver_name VARCHAR(100)
-
+    driver_name VARCHAR(100),
+    vehicle_number VARCHAR(50),
+    route_id INT DEFAULT NULL,
+    lat DOUBLE DEFAULT 0,
+    lng DOUBLE DEFAULT 0,
+    speed DOUBLE DEFAULT 0,
+    last_gps_time DATETIME DEFAULT NULL,
+    status ENUM('ONLINE','OFFLINE') DEFAULT 'OFFLINE'
 );
 
 CREATE TABLE IF NOT EXISTS routes (
-    id INT PRIMARY KEY ,
-    route_name VARCHAR(100) NOT NULL,
-    stop_lat DOUBLE NOT NULL,
-    stop_lng DOUBLE NOT NULL
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    route_name VARCHAR(100) NOT NULL
 
+);
+
+-- Ordered polyline points per route (sequence last)
+CREATE TABLE IF NOT EXISTS route_points (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    route_id INT NOT NULL,
+    lat DOUBLE NOT NULL,
+    lng DOUBLE NOT NULL,
+    seq INT NOT NULL,
+    FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
+    INDEX(route_id, seq)
+);
+
+-- Named bus stops per route (sequence last)
+CREATE TABLE IF NOT EXISTS bus_stops (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    route_id INT NOT NULL,
+    lat DOUBLE NOT NULL,
+    lng DOUBLE NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    seq INT NOT NULL,
+    FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
+    INDEX(route_id, seq)
 );
 
 CREATE TABLE IF NOT EXISTS bus_location (
