@@ -23,42 +23,28 @@ $lat      = $_POST['latitude'];
 $lng      = $_POST['longitude'];
 $speed    = $_POST['speed'];
 
-$now = date("Y-m-d H:i:s");
+// 3. Update drivers table: set lat,lng,last_gps_time and status=ONLINE
+$sql = "UPDATE drivers SET route_id = ?, lat = ?, lng = ?, speed = ?, last_gps_time = NOW(), status = 'ONLINE' WHERE id = ?";
 
-// 3. Check if bus already exists
-$check = "SELECT bus_id FROM bus_location WHERE bus_id = '$bus_id'";
-$result = mysqli_query($conn, $check);
-
-if (mysqli_num_rows($result) > 0) {
-    // 4A. Update existing row
-    $query = "
-        UPDATE bus_location
-        SET route_id = '$route_id',
-            latitude = '$lat',
-            longitude = '$lng',
-            speed = '$speed',
-            last_updated = '$now'
-        WHERE bus_id = '$bus_id'
-    ";
-} else {
-    // 4B. Insert new row
-    $query = "
-        INSERT INTO bus_location
-        (bus_id, route_id, latitude, longitude, speed, last_updated)
-        VALUES
-        ('$bus_id', '$route_id', '$lat', '$lng', '$speed', '$now')
-    ";
+$stmt = mysqli_prepare($conn, $sql);
+if (!$stmt) {
+    echo json_encode(["success" => false, "message" => "Database prepare error"]);
+    exit;
 }
 
-// 5. Execute query
-if (mysqli_query($conn, $query)) {
-    echo json_encode([
-        "success" => true,
-        "message" => "Location updated"
-    ]);
+mysqli_stmt_bind_param($stmt, 'sddss', $route_id, $lat, $lng, $speed, $bus_id);
+if (!mysqli_stmt_execute($stmt)) {
+    echo json_encode(["success" => false, "message" => "Database execute error"]);
+    mysqli_stmt_close($stmt);
+    exit;
+}
+
+$affected = mysqli_stmt_affected_rows($stmt);
+mysqli_stmt_close($stmt);
+
+if ($affected > 0) {
+    echo json_encode(["success" => true, "message" => "Location updated"]);
 } else {
-    echo json_encode([
-        "success" => false,
-        "message" => "Database error"
-    ]);
+    // If no row was updated, the driver id may be unknown
+    echo json_encode(["success" => false, "message" => "Driver not found or no change"]);
 }

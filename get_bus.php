@@ -14,44 +14,87 @@ if (!isset($_POST['route_id'])) {
 
 $route_id = $_POST['route_id'];
 
-// Fetch latest bus on this route
-$query = "
+// Return drivers on this route that are ONLINE and have recent GPS (30s)
+$sql = "
     SELECT
-        bus_id,
-        latitude,
-        longitude,
+        id AS bus_id,
+        lat AS latitude,
+        lng AS longitude,
         speed,
-        last_updated
-    FROM bus_location
-    WHERE route_id = '$route_id'
-    LIMIT 1
+        last_gps_time AS last_updated
+    FROM drivers
+    WHERE route_id = ?
+      AND status = 'ONLINE'
+      AND last_gps_time > (NOW() - INTERVAL 30 SECOND)
 ";
 
-$result = mysqli_query($conn, $query);
-
-if (!$result || mysqli_num_rows($result) == 0) {
-    echo json_encode([
-        "success" => false,
-        "message" => "No bus found on this route"
-    ]);
+$stmt = mysqli_prepare($conn, $sql);
+if (!$stmt) {
+    echo json_encode(["success" => false, "message" => "Database prepare error"]);
     exit;
 }
 
-$bus = mysqli_fetch_assoc($result);
+mysqli_stmt_bind_param($stmt, 's', $route_id);
+if (!mysqli_stmt_execute($stmt)) {
+    echo json_encode(["success" => false, "message" => "Database execute error"]);
+    mysqli_stmt_close($stmt);
+    exit;
+}
 
-// Check offline (15 seconds)
-$last = strtotime($bus['last_updated']);
-$now  = time();
+$res = mysqli_stmt_get_result($stmt);
+$buses = [];
+while ($row = mysqli_fetch_assoc($res)) {
+    $buses[] = $row;
+}
+mysqli_stmt_close($stmt);
 
-$offline = ($now - $last > 15);
+// Fetch ordered route polyline points (id, route_id, lat, lng, seq)
+$sqlPoints = "
+    SELECT id, route_id, lat, lng, seq
+    FROM route_points
+    WHERE route_id = ?
+    ORDER BY seq ASC
+";
+$stmtP = mysqli_prepare($conn, $sqlPoints);
+if ($stmtP) {
+    mysqli_stmt_bind_param($stmtP, 's', $route_id);
+    mysqli_stmt_execute($stmtP);
+    $resP = mysqli_stmt_get_result($stmtP);
+    $route_points = [];
+    while ($row = mysqli_fetch_assoc($resP)) {
+        $route_points[] = $row;
+    }
+    mysqli_stmt_close($stmtP);
+} else {
+    $route_points = [];
+}
+
+// Fetch ordered bus stops (id, route_id, lat, lng, name, seq)
+$sqlStops = "
+    SELECT id, route_id, lat, lng, name, seq
+    FROM bus_stops
+    WHERE route_id = ?
+    ORDER BY seq ASC
+";
+$stmtS = mysqli_prepare($conn, $sqlStops);
+if ($stmtS) {
+    mysqli_stmt_bind_param($stmtS, 's', $route_id);
+    mysqli_stmt_execute($stmtS);
+    $resS = mysqli_stmt_get_result($stmtS);
+    $bus_stops = [];
+    while ($row = mysqli_fetch_assoc($resS)) {
+        $bus_stops[] = $row;
+    }
+    mysqli_stmt_close($stmtS);
+} else {
+    $bus_stops = [];
+}
 
 echo json_encode([
     "success" => true,
-    "bus_id" => $bus['bus_id'],
-    "latitude" => $bus['latitude'],
-    "longitude" => $bus['longitude'],
-    "speed" => $bus['speed'],
-    "last_updated" => $bus['last_updated'],
-    "offline" => $offline
+    "buses_count" => count($buses),
+    "buses" => $buses,
+    "route_points" => $route_points,
+    "bus_stops" => $bus_stops
 ]);
 

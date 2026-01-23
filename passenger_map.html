@@ -47,12 +47,14 @@
   }).addTo(map);
 
   function updateBusLocation() {
+    const params = new URLSearchParams(window.location.search);
+    const routeId = params.get('route_id') || '1';
     fetch("get_bus.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: "route_id=1"
+      body: `route_id=${routeId}`
     })
     .then(res => res.json())
     .then(data => {
