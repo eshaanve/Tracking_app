@@ -2,29 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passenger Portal - Live Tracker</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Select Destination</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        body { font-family: 'Inter', sans-serif; background: #0b0f1a; color: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { width: 400px; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 40px; text-align: center; }
+        select, button { width: 100%; padding: 14px; margin-top: 15px; border-radius: 12px; border: none; }
+        select { background: rgba(15, 23, 42, 0.6); color: white; border: 1.5px solid rgba(255, 255, 255, 0.1); }
+        button { background: #3b82f6; color: white; font-weight: 700; cursor: pointer; }
+    </style>
 </head>
 <body>
     <div class="container">
+        <h2>Welcome, <span id="user-display"></span></h2>
+        <p>Select Route & Destination</p>
+        
+        <select id="route-choice">
+            <option value="1">Route 1: Sumeru - Ratna Park</option>
+            <option value="2">Route 2: Sundhara - Kavresthali</option>
+            <option value="3">Route 3: Lagankhel - Budanilkantha</option>
+        </select>
 
-        <div id="dest-section" class="hidden">
-            <h2>Welcome, <span id="user-display"></span></h2>
-            <p>Select your route:</p>
-            <select id="route-select">
-                <option value="1">Sumeru-Ratnapark</option>
-                <option value="2">Kavresthali-Sundhara</option>
-                <option value="3">Lagankhel-Buddhanilkantha</option>
-            </select>
-            <button onclick="startTracking()">Find Nearest Bus</button>
-            <button onclick="logout()" style="margin-top: 10px; background: #dc2626;">Logout</button>
-        </div>
+
+        <button onclick="goToMap()">View Live Map</button>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="passenger.js"></script>
-    
+    <script>
+        document.getElementById('user-display').innerText = localStorage.getItem('userName') || "Passenger";
+        
+        function goToMap() {
+            localStorage.setItem('selectedRouteId', document.getElementById('route-choice').value);
+            window.location.href = "passenger_map.html";
+        }
+    </script>
 </body>
 </html>

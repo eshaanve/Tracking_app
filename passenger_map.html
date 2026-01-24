@@ -1,30 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bus Tracker Map</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Bus Tracker - Interactive View</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 
-  <style>
-    body { margin: 0; padding: 0; }
-    #map { height: 100vh; width: 100%; }
-    
-    /* Hide the routing instructions panel */
-    .leaflet-routing-container { display: none; }
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        
+        /* Clean UI: Hide the routing instruction panel */
+        .leaflet-routing-container { display: none; }
 
-    /* Style for the stop name labels */
-    .stop-label-style {
-        background: white;
-        border: 1px solid #3498db;
-        border-radius: 4px;
-        padding: 4px 8px;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-  </style>
+        /* Style for the stop name labels (Tooltips) */
+        .stop-label-style {
+            background: white;
+            border: 1.5px solid #3b82f6;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-weight: 700;
+            color: #1e293b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 13px;
+        }
+
+        /* Smoothing the bus movement via CSS transition */
+        .leaflet-marker-icon {
+            transition: transform 0.3s linear;
+        }
+    </style>
 </head>
 <body>
 
@@ -32,92 +39,118 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.min.js"></script>
+<script src="https://unpkg.com/leaflet-marker-slide_to@latest/dist/leaflet-marker-slide_to.js"></script>
 <script src="route_data.js"></script>
 
 <script>
-  // Initialize map
-  const map = L.map('map').setView([27.7172, 85.3240], 13);
+    // 1. SETTINGS & INITIALIZATION
+    const activeRouteId = localStorage.getItem('selectedRouteId') || "3";
+    const map = L.map('map').setView([27.7172, 85.3240], 14);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '© CARTO'
-  }).addTo(map);
-
-  // Define Custom Icons
-  const stopIcon = L.icon({
-    iconUrl: 'assets/stop-icon.png', 
-    iconSize: [32, 32],
-    iconAnchor: [16, 32]
-  });
-
-  const busIcon = L.icon({
-    iconUrl: 'assets/bus.png',
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20]
-  });
-
-  // 4. ADDED: Interactive Routing and Stops
-  if (typeof routeStops !== 'undefined') {
-    const waypoints = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
-
-    L.Routing.control({
-      waypoints: waypoints,
-      addWaypoints: false,
-      draggableWaypoints: false,
-      show: false,
-      lineOptions: {
-        styles: [{ color: '#3498db', opacity: 0.6, weight: 6 }]
-      },
-      createMarker: function(i, wp) {
-        const marker = L.marker(wp.latLng, {
-          icon: stopIcon,
-          interactive: true
-        });
-
-        // This makes the name appear only when you click or hover
-        marker.bindTooltip(routeStops[i].name || "Stop " + (i + 1), {
-          permanent: false, 
-          sticky: true,
-          direction: 'top',
-          className: 'stop-label-style'
-        });
-
-        // Zoom in when a stop is clicked
-        marker.on('click', function(e) {
-          map.setView(e.target.getLatLng(), 16);
-        });
-
-        return marker;
-      }
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '© CARTO'
     }).addTo(map);
-  }
 
-  // Live Bus Marker
-  const busMarker = L.marker([27.7172, 85.3240], { icon: busIcon }).addTo(map);
+    // 2. DEFINE ICONS
+    const stopIcon = L.icon({
+        iconUrl: 'assets/stop-icon.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+    });
 
-  function updateBusLocation() {
-    const params = new URLSearchParams(window.location.search);
-    const routeId = params.get('route_id') || '1';
-    fetch("get_bus.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `route_id=${routeId}`
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        busMarker.setLatLng([parseFloat(data.latitude), parseFloat(data.longitude)]);
-        const status = data.offline ? "Offline" : "Online";
-        busMarker.setPopupContent(`Bus Status: ${status}<br>Speed: ${data.speed} km/h`);
-      }
-    })
-    .catch(err => console.error(err));
-  }
+    const busIcon = L.icon({
+        iconUrl: 'assets/bus.png',
+        iconSize: [45, 45],
+        iconAnchor: [22, 22] // Centered for rotation
+    });
 
-  updateBusLocation();
-  setInterval(updateBusLocation, 5000);
+    // 3. DRAW ROUTE (SHORTEST PATH)
+    if (typeof allRoutes !== 'undefined' && allRoutes[activeRouteId]) {
+        const stops = allRoutes[activeRouteId];
+        const waypoints = stops.map(s => L.latLng(s.lat, s.lng));
+
+        L.Routing.control({
+            waypoints: waypoints,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            show: false,
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'car' // Finds shortest road-legal path
+            }),
+            lineOptions: {
+                styles: [{ color: '#3b82f6', opacity: 0.7, weight: 6 }]
+            },
+            createMarker: function(i, wp) {
+                const marker = L.marker(wp.latLng, { icon: stopIcon });
+
+                // Interactive: Show name on click/hover
+                marker.bindTooltip(stops[i].name, {
+                    permanent: false,
+                    sticky: true,
+                    direction: 'top',
+                    className: 'stop-label-style'
+                });
+
+                marker.on('click', (e) => map.setView(e.target.getLatLng(), 16));
+                return marker;
+            }
+        }).addTo(map);
+    }
+
+    // 4. LIVE BUS TRACKING (SLIDING & ROTATING)
+    let busMarker = L.marker([27.7172, 85.3240], { 
+        icon: busIcon,
+        rotationAngle: 0,
+        rotationOrigin: 'center'
+    }).addTo(map);
+
+    let lastPos = null;
+
+    // Helper: Calculate bearing angle for rotation
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+        const dLng = (lng2 - lng1) * (Math.PI / 180);
+        const y = Math.sin(dLng) * Math.cos(lat2 * (Math.PI / 180));
+        const x = Math.cos(lat1 * (Math.PI / 180)) * Math.sin(lat2 * (Math.PI / 180)) -
+                  Math.sin(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.cos(dLng);
+        return (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360;
+    }
+
+    function updateBus() {
+        fetch("get_bus.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "route_id=" + activeRouteId
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const newLat = parseFloat(data.latitude);
+                const newLng = parseFloat(data.longitude);
+                const newPos = L.latLng(newLat, newLng);
+
+                if (lastPos && !newPos.equals(lastPos)) {
+                    // Update Rotation
+                    const angle = calculateBearing(lastPos.lat, lastPos.lng, newLat, newLng);
+                    busMarker.setRotationAngle(angle);
+
+                    // Update Position (Smooth Glide)
+                    busMarker.slideTo([newLat, newLng], { duration: 4500 });
+                } else {
+                    busMarker.setLatLng(newPos);
+                }
+                
+                lastPos = newPos;
+            }
+        })
+        .catch(err => console.error("Update failed:", err));
+    }
+
+    // Run update every 5 seconds
+    setInterval(updateBus, 5000);
+    updateBus();
+
 </script>
 
 </body>
