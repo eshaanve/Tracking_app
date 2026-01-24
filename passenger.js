@@ -19,9 +19,6 @@ window.onload = () => {
     if (isChoicePage && user) window.location.href = "Pdestination.html";
 
     if (isMapPage) {
-        const params = new URLSearchParams(window.location.search);
-        document.getElementById('live-fare').innerText = "Rs. " + (params.get('fare') || "0");
-        document.getElementById('target-dest-display').innerText = "To: " + (params.get('dest') || "Unknown");
         initMap();
     } else if (isDestPage) {
         if (!user) window.location.href = "passenger.html";
@@ -108,8 +105,9 @@ window.loginUser = function(mode) {
 };
 
 window.startTracking = function() {
-    const sel = document.getElementById('destination');
-    window.location.href = `Ptracking.html?fare=${sel.options[sel.selectedIndex].dataset.fare}&dest=${encodeURIComponent(sel.value)}`;
+    const routeSel = document.getElementById('route-select');
+    const routeId = routeSel ? routeSel.value : '1';
+    window.location.href = `Ptracking.html?route_id=${routeId}`;
 };
 
 function initMap() {
@@ -138,7 +136,9 @@ window.logout = function() {
 
 async function fetchBusData() {
     try {
-        const res = await fetch("get_bus.php", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "route_id=1" });
+        const params = new URLSearchParams(window.location.search);
+        const routeId = params.get('route_id') || '1';
+        const res = await fetch("get_bus.php", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: `route_id=${routeId}` });
         const d = await res.json();
         if (d.success) {
             const busPos = L.latLng(parseFloat(d.latitude), parseFloat(d.longitude));

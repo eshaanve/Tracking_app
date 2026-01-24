@@ -24,14 +24,17 @@ if (empty($vehicle_number)) {
     exit;
 }
 
-// Insert into bus_location (assuming bus_id is vehicle_number)
-$query = "INSERT INTO bus_location (bus_id, route_id, latitude, longitude, speed, last_updated) VALUES ('$vehicle_number', $route_id, 0, 0, 0, NOW()) ON DUPLICATE KEY UPDATE route_id = $route_id, last_updated = NOW()";
+// Insert or update driver record in `drivers` table
+$driver_id = (int)$driver_id;
+$vehicle_number_esc = mysqli_real_escape_string($conn, $vehicle_number);
+
+$query = "INSERT INTO drivers (id, route_id, vehicle_number, lat, lng, speed, last_gps_time, status) VALUES ($driver_id, $route_id, '$vehicle_number_esc', 0, 0, 0, NOW(), 'OFFLINE') ON DUPLICATE KEY UPDATE route_id = $route_id, vehicle_number = '$vehicle_number_esc', last_gps_time = NOW()";
 
 if (mysqli_query($conn, $query)) {
     echo json_encode([
         "success" => true,
         "message" => "Driver setup saved successfully",
-        "bus_id" => $vehicle_number
+        "driver_id" => $driver_id
     ]);
 } else {
     echo json_encode([
