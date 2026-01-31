@@ -19,7 +19,7 @@ $route_id = $_POST['route_id'];
 
 // Return drivers on this route that are ONLINE and have recent GPS (30s)
 $sql = "
-    SELECT
+SELECT
     id AS bus_id,
     lat AS latitude,
     lng AS longitude,
@@ -28,9 +28,11 @@ $sql = "
 FROM drivers
 WHERE lat != 0
 AND lng != 0
-
-
+AND status = 'ONLINE'
+AND route_id = ?
+AND last_gps_time > (NOW() - INTERVAL 30 SECOND)
 ";
+
 
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
@@ -38,11 +40,14 @@ if (!$stmt) {
     exit;
 }
 
+mysqli_stmt_bind_param($stmt, "i", $route_id);
+
 if (!mysqli_stmt_execute($stmt)) {
     echo json_encode(["success" => false, "message" => "Database execute error"]);
     mysqli_stmt_close($stmt);
     exit;
 }
+
 
 $res = mysqli_stmt_get_result($stmt);
 $buses = [];
@@ -55,4 +60,3 @@ echo json_encode([
     "success" => true,
     "buses" => $buses
 ]);
-
