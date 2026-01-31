@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Live Bus Tracker - Interactive View</title>
+    <title>RouteSync | Live Bus View</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+    <link rel="shortcut icon" href="assets/favicon.png">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
@@ -41,6 +43,7 @@
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.min.js"></script>
 <script src="https://unpkg.com/leaflet-marker-slide_to@latest/dist/leaflet-marker-slide_to.js"></script>
+
 <script src="route_data.js"></script>
 
 <script>
@@ -100,13 +103,9 @@
     }
 
     // 4. LIVE BUS TRACKING (SLIDING & ROTATING)
-    let busMarker = L.marker([27.7172, 85.3240], { 
-        icon: busIcon,
-        rotationAngle: 0,
-        rotationOrigin: 'center'
-    }).addTo(map);
+    let busMarkers = {};     // store markers per bus_id
+	let lastPositions = {}; // store last position per bus
 
-    let lastPos = null;
 
     // Helper: Calculate bearing angle for rotation
     function calculateBearing(lat1, lng1, lat2, lng2) {
@@ -117,43 +116,65 @@
         return (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360;
     }
 
-    function updateBus() {
-        fetch("get_bus.php", {
-            method: "POST",
-            body: new URLSearchParams({ route_id: activeRouteId })
-        })
+function updateBus() {
+console.log("Polling server...");
 
-        .then(res => res.text())
-        .then(text => {
-            const data = JSON.parse(text);
-       
-            if (data.success) {
-                if (!data.buses || data.buses.length === 0) return;
 
-                const newLat = parseFloat(data.buses[0].latitude);
-                const newLng = parseFloat(data.buses[0].longitude);
+    fetch("get_bus.php", {
+        method: "POST",
+        body: new URLSearchParams({ route_id: activeRouteId })
+    })
+    .then(res => res.json())
+    .then(data => {
 
-                const newPos = L.latLng(newLat, newLng);
+    if (!data.success || !data.buses || data.buses.length === 0) return;
+    const activeBusIds = {};
 
-                if (lastPos && !newPos.equals(lastPos)) {
-                    // Update Rotation
-                    const angle = calculateBearing(lastPos.lat, lastPos.lng, newLat, newLng);
-                    busMarker.setRotationAngle(angle);
 
-                    // Update Position (Smooth Glide)
-                    busMarker.slideTo([newLat, newLng], { duration: 4500 });
-                } else {
-                    busMarker.setLatLng(newPos);
-                }
-                
-                lastPos = newPos;
-            }
-        })
-        .catch(err => console.error("Update failed:", err));
-    }
+    data.buses.forEach(bus => {
 
-    // Run update every 5 seconds
-    setInterval(updateBus, 5000);
+        const busId = bus.bus_id;
+        activeBusIds[busId] = true;
+        const newLat = parseFloat(bus.latitude);
+        const newLng = parseFloat(bus.longitude);
+        const newPos = L.latLng(newLat, newLng);
+
+        if (!busMarkers[busId]) {
+            busMarkers[busId] = L.marker(newPos, {
+                icon: busIcon,
+                rotationAngle: 0,
+                rotationOrigin: 'center'
+            }).addTo(map);
+
+            lastPositions[busId] = newPos;
+            return;
+        }
+
+
+        const lastPos = lastPositions[busId];
+        const angle = calculateBearing(lastPos.lat, lastPos.lng, newLat, newLng);
+
+        busMarkers[busId].setRotationAngle(angle);
+        busMarkers[busId].slideTo(newPos, { duration: 2000 });
+
+        lastPositions[busId] = newPos;
+    });
+    for (const id in busMarkers) {
+    		if (!activeBusIds[id]) {
+        		map.removeLayer(busMarkers[id]);
+        		delete busMarkers[id];
+        		delete lastPositions[id];
+    		}
+	}
+
+})
+.catch(err => console.log("Fetch error:", err));
+
+}
+
+
+    // Run update every 2 seconds
+    setInterval(updateBus, 2000);
     updateBus();
 
 </script>
