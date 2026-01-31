@@ -45,7 +45,7 @@
 
 <script>
     // 1. SETTINGS & INITIALIZATION
-    const activeRouteId = localStorage.getItem('selectedRouteId') || "3";
+    const activeRouteId = localStorage.getItem('selectedRouteId') || "1";
     const map = L.map('map').setView([27.7172, 85.3240], 14);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -120,14 +120,19 @@
     function updateBus() {
         fetch("get_bus.php", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "route_id=" + activeRouteId
+            body: new URLSearchParams({ route_id: activeRouteId })
         })
-        .then(res => res.json())
-        .then(data => {
+
+        .then(res => res.text())
+        .then(text => {
+            const data = JSON.parse(text);
+       
             if (data.success) {
-                const newLat = parseFloat(data.latitude);
-                const newLng = parseFloat(data.longitude);
+                if (!data.buses || data.buses.length === 0) return;
+
+                const newLat = parseFloat(data.buses[0].latitude);
+                const newLng = parseFloat(data.buses[0].longitude);
+
                 const newPos = L.latLng(newLat, newLng);
 
                 if (lastPos && !newPos.equals(lastPos)) {

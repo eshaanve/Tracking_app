@@ -20,29 +20,6 @@ CREATE TABLE IF NOT EXISTS routes (
 
 );
 
--- Ordered polyline points per route (sequence last)
-CREATE TABLE IF NOT EXISTS route_points (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    route_id INT NOT NULL,
-    lat DOUBLE NOT NULL,
-    lng DOUBLE NOT NULL,
-    seq INT NOT NULL,
-    FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
-    INDEX(route_id, seq)
-);
-
--- Named bus stops per route (sequence last)
-CREATE TABLE IF NOT EXISTS bus_stops (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    route_id INT NOT NULL,
-    lat DOUBLE NOT NULL,
-    lng DOUBLE NOT NULL,
-    name VARCHAR(150) NOT NULL,
-    seq INT NOT NULL,
-    FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE CASCADE,
-    INDEX(route_id, seq)
-);
-
 CREATE TABLE IF NOT EXISTS bus_location (
     bus_id INT PRIMARY KEY,
     route_id INT NOT NULL,

@@ -129,10 +129,23 @@ function initGPS() {
 }
 
 function successFunction(position) {
-    if (latDisplay) latDisplay.innerText = position.coords.latitude;
-    if (lngDisplay) lngDisplay.innerText = position.coords.longitude;
+
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    const speed = position.coords.speed || 0;
+
+    // STORE FOR DATABASE
+    lastCoords = {
+        latitude: latitude,
+        longitude: longitude,
+        speed: speed
+    };
+
+    if (latDisplay) latDisplay.innerText = latitude;
+    if (lngDisplay) lngDisplay.innerText = longitude;
     if (statusDisplay) statusDisplay.innerText = "GPS access allowed";
 }
+
 
 function errorFunction(error) {
     if (statusDisplay) {
@@ -146,17 +159,84 @@ function errorFunction(error) {
     }
 }
 
-// Start/Stop buttons (to be implemented with gps_update.php)
+let gpsWatchId = null;
+let gpsSendIntervalId = null;
+let lastCoords = null;
+
+function sendGpsUpdate() {
+    if (!driverData || !lastCoords) return;
+
+    const busId = driverData.bus_id || (driverData.vehicle_number && /^\d+$/.test(driverData.vehicle_number) ? driverData.vehicle_number : driverData.driver_id);
+    const params = new URLSearchParams({
+        driver_id: driverData.driver_id,
+        bus_id: busId,
+        route_id: driverData.route_id || "",
+        latitude: lastCoords.latitude,
+        longitude: lastCoords.longitude,
+        speed: lastCoords.speed || 0
+    });
+
+    fetch('gps_update.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            console.warn('GPS update failed:', data.message);
+            if (statusDisplay) statusDisplay.innerText = `GPS error: ${data.message}`;
+        }
+    })
+    .catch(err => {
+        console.error('GPS update error:', err);
+        if (statusDisplay) statusDisplay.innerText = "GPS update error";
+    });
+}
+
+// Start/Stop buttons
 if (document.getElementById('start_btn')) {
     document.getElementById('start_btn').onclick = () => {
+        if (!navigator.geolocation) {
+            if (statusDisplay) statusDisplay.innerText = "GPS not supported by this browser";
+            return;
+        }
+
         if (statusDisplay) statusDisplay.innerText = "Trip Started";
-        // Send start to server
+
+        if (gpsWatchId === null) {
+            gpsWatchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const { latitude, longitude, speed } = position.coords;
+                    lastCoords = { latitude, longitude, speed: speed || 0 };
+                    if (latDisplay) latDisplay.innerText = latitude;
+                    if (lngDisplay) lngDisplay.innerText = longitude;
+                    if (statusDisplay) statusDisplay.innerText = "GPS access allowed";
+                },
+                (error) => {
+                    console.error(error);
+                    if (statusDisplay) statusDisplay.innerText = "GPS error occurred";
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        if (gpsSendIntervalId === null) {
+            gpsSendIntervalId = setInterval(sendGpsUpdate, 5000);
+        }
     };
 }
 
 if (document.getElementById('stop_btn')) {
     document.getElementById('stop_btn').onclick = () => {
+        if (gpsWatchId !== null) {
+            navigator.geolocation.clearWatch(gpsWatchId);
+            gpsWatchId = null;
+        }
+        if (gpsSendIntervalId !== null) {
+            clearInterval(gpsSendIntervalId);
+            gpsSendIntervalId = null;
+        }
         if (statusDisplay) statusDisplay.innerText = "Trip Stopped";
-        // Send stop to server
     };
 }

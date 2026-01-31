@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Destination</title>
     <link rel="stylesheet" href="style.css"> <style>
         body { font-family: 'Inter', sans-serif; background: #0b0f1a; color: #f1f5f9; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
@@ -27,8 +28,23 @@
     </div>
 
     <script>
-        document.getElementById('user-display').innerText = localStorage.getItem('userName') || "Passenger";
-        
+        const storedPassenger = localStorage.getItem('passengerData');
+        let passenger = null;
+
+        if (storedPassenger) {
+            try {
+                passenger = JSON.parse(storedPassenger);
+            } catch (e) {
+                localStorage.removeItem('passengerData');
+            }
+        }
+
+        if (!passenger) {
+            window.location.href = "passenger.html";
+        } else {
+            document.getElementById('user-display').innerText = passenger.name || "Passenger";
+        }
+
         function goToMap() {
             localStorage.setItem('selectedRouteId', document.getElementById('route-choice').value);
             window.location.href = "passenger_map.html";
